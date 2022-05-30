@@ -1,11 +1,42 @@
 #include <iostream>
+#include <optional>
 #include <variant>
 #include <tuple>
 #include <any>
 
-#include "meta.hpp"
-
 namespace vx {
+
+// ===== [ try_find ] =====
+namespace detail {
+    template <typename X, typename... Ts>
+    struct try_find_impl {};
+
+    template <typename X, typename T, typename... Ts>
+    struct try_find_impl<X, T,Ts...> {
+        static constexpr std::optional<size_t> try_find(size_t index=0) noexcept {
+            return try_find_impl<X, Ts...>::try_find(index+1);
+        }
+    };
+
+    template <typename T, typename... Ts>
+    struct try_find_impl<T, T,Ts...> {
+        static constexpr std::optional<size_t> try_find(size_t index=0) noexcept {
+            return {index};
+        }
+    };
+
+    template <typename X>
+    struct try_find_impl<X> {
+        static constexpr std::optional<size_t> try_find(size_t=0) noexcept {
+            return {};
+        }
+    };
+}//detail
+
+template <typename X, typename... Ts>
+constexpr std::optional<size_t> try_find(size_t index=0) {
+    return detail::try_find_impl<X, Ts...>::try_find(index);
+}
 
 // =====[ at ]=====
 template <size_t I> struct at_index : std::in_place_index_t<I> {};
@@ -70,7 +101,7 @@ template <typename T> inline constexpr compare<T> is {};
 // =====[ variant|is ]=====
 template <typename... Ts, typename Type>
 #if __cplusplus/100 >= 2020
-requires( meta::try_find<Type, Ts...>() |as <bool> )
+requires( try_find<Type, Ts...>() |as <bool> )
 #endif
 constexpr bool  operator| (std::variant<Ts...> const& variant, compare<Type>) {
     return std::holds_alternative<Type>(variant);
