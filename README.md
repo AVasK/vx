@@ -59,15 +59,14 @@ std::any v = 3.14f;
 ```
 
 ```C++
-if (any_v.type() == typeid(std::string)) {
-    std::cout << (std::any_cast<std::string>(any_v));
+if (v.type() == typeid(std::string)) {
+    std::cout << (std::any_cast<std::string>(v));
 }
 ```
 
 ```C++
 if (v |is <float>) {
     v |as <float> = 7.77f;      // (1)
-    v |at <1> = 7.77f;          // (2)
 }
 ```
 Starting to see the similarity?)
