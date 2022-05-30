@@ -15,6 +15,63 @@ To query what type does our variable hold we should use `std::holds_alternative`
 
 `at` and `as` can also be used where you'd otherwise write   `std::in_place_index<>` and `std::in_place_type<>` respectively, so if you, like me, had trouble remembering all those names and disliked the way those monstrosities devoured the free space on the line of code they appeared, behold, there's a sexy new `as<>` (and `at<>`, too). Or at least as sexy as it gets unless we get a language-level keyword for `as` and `is` some day... ~~pretty sure we ain't getting one for `at` though~~
 
+## Examples
+> ## extending variant
+
+Assuming we have some variant, e.g.
+```C++
+std::variant<int, float> v = 3.14f;
+```
+to do something if it holds a `float` we'll need
+>  Standard way:
+> ```C++
+> if (std::holds_alternative<float>(v)) {
+>     std::get<float>(v) = 7.77f; // (1)
+>     std::get<1>(v) = 7.77f;     // (2)
+> }
+> ```
+
+> The proposed way:
+> ```C++
+> if (v |is <float>) {
+>     v |as <float> = 7.77f;      // (1)
+>     v |at <1> = 7.77f;          // (2)
+> }
+> ```
+
+When constructing in place:
+> Standard approach:
+> ```C++
+> std::variant<...> v {std::in_place_type<X>, args...};
+> std::variant<...> v {std::in_place_index<I>, args...};
+> ```
+
+> Proposed approach:
+> ```C++
+> std::variant<...> v {as<X>, args...};
+> std::variant<...> v {at<1>, args...};
+> ```
+
+> ## extending any
+
+```C++
+std::any v = 3.14f;
+```
+
+```C++
+if (any_v.type() == typeid(std::string)) {
+    std::cout << (std::any_cast<std::string>(any_v));
+}
+```
+
+```C++
+if (v |is <float>) {
+    v |as <float> = 7.77f;      // (1)
+    v |at <1> = 7.77f;          // (2)
+}
+```
+Starting to see the similarity?)
+
 ## match
 Let's be honest, std::visit doesn't look particularly good, even with overloaded{} pattern the visitation leaves *a lot* to be desired. The most common case is trying to visit (for some it'll look like matching...) a single variant to ~~/with/whatever you call it~~ multiple functions, i.e. this:
 ```C++
