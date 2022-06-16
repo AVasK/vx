@@ -14,7 +14,7 @@ std::visit(overloaded {
 }, v); // <--- v comes last,
 // not to mention that the "std::visit(overloaded {" part could definitely be better...
 ```
-And it also seems to be the usecase with the greatest optimisation potential 
+The single-visitation also seems to be the most used one and the one with the greatest optimisation potential 
 > e.g. using jump-tables and making it possible for the compiler to successfully inline functions vs. using a table of function pointers which are hard for the compiler to see through.
 
 Regardless, we are visiting a single variant, so why pay (in code clarity) for what we don't use?
