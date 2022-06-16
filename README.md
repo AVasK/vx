@@ -1,6 +1,6 @@
 # vx - the much needed syntactic sugar and unification for std::variant, std::optional, std::any, (parts of it work with std::tuple, std::array & more...)
 
- - `match` for std::variant 
+ - `match` for std::variant and std::optional
  - generic `as` / `is` / `at` ops for variant/any/tuple/array
 
  > Supports C++17, but uses C++20 concepts when available.
