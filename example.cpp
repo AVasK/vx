@@ -1,10 +1,17 @@
 #include <iostream>
+#include <cassert>
 #include "vx.hpp"
 
+#include <optional>
+#include <variant>
 #include <complex>
-#include <cassert>
 #include <array>
 #include <tuple>
+
+template <typename T>
+void print(T const& value) {
+    std::cout << value << "\n";
+}
 
 int main() {
     using vx::as;
@@ -13,13 +20,11 @@ int main() {
     using vx::match;
 
     // behaves like static_cast for other types if not overloaded
-    // (?) may lead to a slight ambiguity from one perspective
-    // (+) looks totally normal from the other perspective if you think of variant as a sum type.
     std::cout << (3.14 |as <int>);
 
     // testing & getting variant alternatives
     std::variant<int, float> v = 3.14f;
-    if (v |is <float>) std::cout << (v |as <float>);
+    if (v |is <float>) print(v |as <float>);
     v |as <float> = 7.77f;
     std::cout << (v |at <1>);
 
@@ -29,9 +34,19 @@ int main() {
         std::cout << "\nw: " << (w |as <float>) << "\n";
     }
 
+    // match for std::variant
     w | match {
-        [](int x){ std::cout << "int " << x << "\n"; },
-        [](float x){ std::cout << "float " << x << "\n"; }
+        [](int x) { std::cout << "int" << x << '\n'; },
+        [](float y) { std::cout << "float" << y << '\n'; },
+        [](auto z) { std::cout << "?\n"; }
+    };
+
+    // match for std::optional
+    std::optional<int> o;
+    o | match {
+        []()      { std::cout << "nothing\n"; }, 
+        [](int v) { std::cout << "int "<< v << "\n"; }
+        // []     { std::cout << "nothing\n"; } // another way to say "empty"
     };
 
     // as / at can be used instead of std::in_place_type / std::in_place_index

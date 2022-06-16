@@ -1,3 +1,4 @@
+#include <type_traits>
 #include <iostream>
 #include <optional>
 #include <variant>
@@ -119,12 +120,22 @@ constexpr bool  operator| (std::any const& a, compare<Type>) {
 template <typename... Fs>
 struct match : Fs... {
     using Fs::operator()...;
+
+    // constexpr match(Fs &&... fs) : Fs{fs}... {}
 };
 template<class... Ts> match(Ts...) -> match<Ts...>;
 
 template <typename... Ts, typename... Fs>
 constexpr decltype(auto) operator| (std::variant<Ts...> const& v, match<Fs...> const& match) {
     return std::visit(match, v);
+}
+
+// =====[ optional match ]=====
+template <typename T, typename... Fs>
+requires (std::is_invocable_v<match<Fs...>, T> && std::is_invocable_v<match<Fs...>>)//&& requires(match<Fs...> const& match){ {match()}; })
+constexpr decltype(auto) operator| (std::optional<T> const& o, match<Fs...> const& match) {
+    if (o.has_value()) return match(o.value());
+    else return match();
 }
 
 }// namespace vx;
