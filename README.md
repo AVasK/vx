@@ -3,6 +3,8 @@
  - `match` for std::variant 
  - generic `as` / `is` / `at` ops for variant/any/tuple/array
 
+ > Supports C++17, but uses C++20 concepts when available.
+
 ## match
 Let's be honest, std::visit doesn't look particularly good, even with overloaded{} pattern the visitation leaves *a lot* to be desired. The most common case is trying to visit (for some it'll look like matching...) a single variant to ~~/with/whatever you call it~~ multiple functions, i.e. this:
 ```C++
@@ -24,6 +26,21 @@ w | match {
     [](float f){ ... }
 };
 ```
+
+## `match`ing optionals:
+matching construct can be used with `optional` values to force **exhaustiveness**
+
+> matching std::optional
+```C++
+    std::optional<int> o;
+    o | match {
+        []()      { std::cout << "nothing\n"; }, 
+        [](int v) { std::cout << "int "<< v << "\n"; }
+        // []     { std::cout << "nothing\n"; } // another way to say "empty"
+    };
+```
+
+The match{...} won't compile if the cases are non-exhaustive.
 
 ## is<> and as<> (and at<>)
 ### Why?
