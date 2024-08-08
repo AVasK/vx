@@ -130,6 +130,11 @@ constexpr decltype(auto) operator| (std::variant<Ts...> const& v, match<Fs...> c
     return std::visit(match, v);
 }
 
+template <typename... Ts, typename... Fs>
+constexpr decltype(auto) operator| (std::variant<Ts...> & v, match<Fs...> const& match) {
+    return std::visit(match, v);
+}
+
 // =====[ optional match ]=====
 template <typename T, typename... Fs>
 #if defined __cpp_concepts && __cplusplus >= __cpp_concepts
