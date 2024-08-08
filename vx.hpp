@@ -110,8 +110,13 @@ constexpr bool  operator| (std::variant<Ts...> const& variant, compare<Type>) {
 
 // =====[ any|is ]=====
 //! constexpr just for being futureproof :)
-template <typename Type>
-constexpr bool  operator| (std::any const& a, compare<Type>) {
+#if defined __cpp_concepts && __cplusplus >= __cpp_concepts
+template <typename Type, typename Any>
+requires std::same_as<Any, std::any>
+#else 
+template <typename Type, typename Any, typename=std::enable_if_t<std::is_same_v<Any, std::any>>>
+#endif
+constexpr bool  operator| (Any const& a, compare<Type>) {
     return a.type() == typeid(Type);
 }
 
